@@ -1,1 +1,45 @@
 
+from flask import Flask, request, jsonify
+import datetime
+import os
+
+app = Flask(__name__)
+
+@app.route('/get_info', methods=['GET'])
+def get_info():
+    try:
+        # Get query parameters
+        slack_name = request.args.get('slack_name')
+        track = request.args.get('track')
+
+        # Validate parameters
+        if not slack_name or not track:
+            return jsonify({"error": "Missing required parameters"}), 400
+
+        # Get current day of the week
+        current_day = datetime.datetime.utcnow().strftime('%A')
+
+        # Get current UTC time
+        current_time_utc = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+
+        # Get GitHub URLs
+        github_url_file = "https://github.com/your_username/your_repo/blob/main/your_file.py"
+        github_url_source = "https://github.com/your_username/your_repo"
+
+        # Create JSON response
+        response = {
+            "slack_name": slack_name,
+            "current_day": current_day,
+            "current_utc_time": current_time_utc,
+            "track": track,
+            "github_url_file": github_url_file,
+            "github_url_source": github_url_source,
+            "status_code": 200
+        }
+
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
